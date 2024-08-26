@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Music Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <link rel="stylesheet" type="text/css" id="light-theme" href="lightTheme.css">
+    <script
+      src="https://kit.fontawesome.com/343744c3ae.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="all-songs">
+        <div class="top">
+          <label for="genres" id="label">Filter By Genre</label>
+          <select id="genres">
+            <!-- <option value="technology">Technology</option>
+             -->
+          </select>
+        </div>
+        <div class="list">
+          <h3 id="list-heading">All Songs</h3>
+          <div id="filtered-songs-list">
+            <!-- <div class="song-item">Dark Horse</div> -->
+          </div>
+        </div>
+      </div>
+
+      <div class="song-card">
+        <div class="card">
+          <img id="song-image" />
+          <span id="song-name"></span>
+          <span id="singer-name"></span>
+        </div>
+        <audio controls id="song-control">
+          <source type="audio/mpeg" id="song-src" />
+          Your browser does not support the audio element.
+        </audio>
+        <div class="buttons">
+          <!-- <button id="play-prev">Previous</button> -->
+          <i class="fa-solid fa-backward" id="play-prev"></i>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <!-- <button id="play-next">Next</button> -->
+          <i class="fa-solid fa-forward" id="play-next"></i>
+        </div>
+        <button id="add-to-playlist">Add To Playlist</button>
+      </div>
+
+      <div class="playlist-section">
+        <div class="upper">
+          <input
+            type="text"
+            id="new-playlist-name"
+            placeholder="Enter Playlist Name"
+          />
+          <button id="add-playlist-btn">Create Playlist</button>
+        </div>
+        <div class="lower">
+          <div class="current-playlist-container">
+            <div class="current-playlist-heading">Current Playlist</div>
+            <div id="current-playlist">
+              <!-- <div class="playlist-song">Playlist SOngs</div> -->
+            </div>
+          </div>
+
+          <h3>All Playlists</h3>
+          <div id="all-playlists">
+            <!-- <div class="playlist-item">Playlist1</div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <label class="toggle-switch">
+      <input type="checkbox" id="toggle-theme-button" />
+      <span class="slider"></span>
+    </label>
+
+    <script src="main.js"></script>
+  </body>
+</html>

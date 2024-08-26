@@ -1,0 +1,11 @@
+.main
+{
+    background-color: #66b9b5;
+}
+.song-item,  .playlist-song, .playlist-item
+{
+    background-color:#93c1e1;
+    /* color:white; */
+}
+ 
+
