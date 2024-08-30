@@ -1,19 +1,19 @@
 const all_songs = [
   {
     id: 1,
-    name: "Problem",
-    artist: "Ariana Grande",
-    img: "mp3/problem.jpeg",
-    genre: "Hip Hop",
-    source: "mp3/Ariana Grande - Problem ft. Iggy Azalea.mp3",
-  },
-  {
-    id: 2,
     name: "Guts Over Fear",
     artist: "Eminem",
     img: "mp3/gutsoverfear.jpeg",
     genre: "Hip Hop",
     source: "mp3/Eminem - Guts Over Fear ft. Sia.mp3",
+  },
+  {
+    id: 2,
+    name: "Problem",
+    artist: "Ariana Grande",
+    img: "mp3/problem.jpeg",
+    genre: "Hip Hop",
+    source: "mp3/Ariana Grande - Problem ft. Iggy Azalea.mp3",
   },
   {
     id: 3,
@@ -249,4 +249,40 @@ function toggleTheme()
   }
 }
 
-document.getElementById("toggle-theme-button").addEventListener('click',toggleTheme);
+document.getElementById("toggle-theme-button").addEventListener('click', toggleTheme);
+
+document.getElementById("searchButton").addEventListener('click',searchCallback);
+document.getElementById("searchInput").addEventListener('keydown', (event) => {
+  if (event.key === "Enter") searchCallback();
+})
+
+
+function searchCallback()
+{
+  let searchString = document.getElementById("searchInput").value;
+  searchString = searchString.trim();
+  // if (searchString === "") return;
+  searchSongs(searchString);
+}
+
+function searchSongs(searchString)
+{
+  let searchQueue = filtered_queue.filter((song) => {
+    if (song.name.toLowerCase().includes(searchString.toLowerCase())) return true;
+    if (song.artist.toLowerCase().includes(searchString.toLowerCase())) return true;
+  });
+  const filteredList = document.getElementById("filtered-songs-list");
+  filteredList.innerHTML = '';
+  searchQueue.forEach((song,index) => {
+    const newItem = document.createElement("div");
+    newItem.classList.add('song-item');
+    newItem.textContent = `${song.name} -${song.artist}`;
+    
+    newItem.addEventListener("click", () => {
+      songsQueue = [...searchQueue];
+      currentSong = index;
+      renderCurrentSong(songsQueue[currentSong]);
+    });
+    filteredList.appendChild(newItem);
+  });
+}
