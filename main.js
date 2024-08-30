@@ -82,42 +82,43 @@ const all_songs = [
   },
 ];
 
-const genresList = ["All", "Pop", "Hip Hop","Rock","Jazz"];
+const genresList = ["All", "Pop", "Hip Hop", "Rock", "Jazz"];
 
 let songsQueue = [...all_songs];
 let currentSong = 0;
 
 let filtered_queue = [];
 
+const playlists = {};
+
+let currentPlaylist = null;
+let isPlaylistActive = false; //to check playlist is any playlist is running
 
 document.getElementById("play-prev").addEventListener("click", playPrev);
 document.getElementById("play-next").addEventListener("click", playNext);
 
-function playNext()
-{
-    currentSong = (currentSong + 1) % songsQueue.length;
-    renderCurrentSong(songsQueue[currentSong]);
+function playNext() {
+  currentSong = (currentSong + 1) % songsQueue.length;
+  renderCurrentSong(songsQueue[currentSong]);
 }
-function playPrev()
-{
-    if (currentSong === 0) currentSong = songsQueue.length - 1;
-    else currentSong--;
-    renderCurrentSong(songsQueue[currentSong]);
+function playPrev() {
+  if (currentSong === 0) currentSong = songsQueue.length - 1;
+  else currentSong--;
+  renderCurrentSong(songsQueue[currentSong]);
 }
 
-function renderCurrentSong(song)
-{
-    const songImg = document.getElementById("song-image");
-    songImg.src = song.img;
-    const songName = document.getElementById("song-name");
-    songName.textContent = song.name;
-    const singerName = document.getElementById("singer-name");
-    singerName.textContent = song.artist;
-    const songControl = document.getElementById("song-control");
-    const songSrc = document.getElementById("song-src");
-    songSrc.src = song.source;
-    songControl.load();
-    songControl.play();
+function renderCurrentSong(song) {
+  const songImg = document.getElementById("song-image");
+  songImg.src = song.img;
+  const songName = document.getElementById("song-name");
+  songName.textContent = song.name;
+  const singerName = document.getElementById("singer-name");
+  singerName.textContent = song.artist;
+  const songControl = document.getElementById("song-control");
+  const songSrc = document.getElementById("song-src");
+  songSrc.src = song.source;
+  songControl.load();
+  songControl.play();
 }
 
 const dropDownList = document.getElementById("genres");
@@ -127,29 +128,27 @@ genresList.forEach((g) => {
   item.textContent = g;
   dropDownList.appendChild(item);
 });
-dropDownList.addEventListener('change', () => {
+dropDownList.addEventListener("change", () => {
   showSongs(dropDownList.value);
 });
 
-function showSongs(genreType)
-{
+function showSongs(genreType) {
   if (genreType === "All") {
     filtered_queue = [...all_songs];
-  }
-  else
-  {
+  } else {
     filtered_queue = all_songs.filter((song) => {
       if (song.genre === genreType) return true;
     });
   }
   const filteredList = document.getElementById("filtered-songs-list");
   filteredList.innerHTML = "";
-  filtered_queue.forEach((song,index) => {
+  filtered_queue.forEach((song, index) => {
     const newItem = document.createElement("div");
     newItem.classList.add("song-item");
     newItem.textContent = `${song.name} -${song.artist}`;
 
-    newItem.addEventListener('click', () => {
+    newItem.addEventListener("click", () => {
+      isPlaylistActive = false;
       songsQueue = [...filtered_queue];
       currentSong = index;
       renderCurrentSong(songsQueue[currentSong]);
@@ -159,13 +158,7 @@ function showSongs(genreType)
   });
 }
 
-
-const playlists = {};
-
-let currentPlaylist=null;
-
-document.getElementById("add-playlist-btn").addEventListener('click', () => {
-
+document.getElementById("add-playlist-btn").addEventListener("click", () => {
   const inputBox = document.getElementById("new-playlist-name");
   const playlListName = inputBox.value;
   inputBox.value = "";
@@ -178,38 +171,94 @@ document.getElementById("add-playlist-btn").addEventListener('click', () => {
   playlistSection.appendChild(playlistItem);
   currentPlaylist = playlListName;
   playlists[playlListName] = [];
-  playlistItem.addEventListener('click', () => {
+  playlistItem.addEventListener("click", () => {
     currentPlaylist = playlListName;
     showPlaylistItems(playlists[currentPlaylist]);
   });
 });
 
-function showPlaylistItems(playlist)
-{
+function showPlaylistItems(playlist) {
   const currentPlaylistEl = document.getElementById("current-playlist");
-  while (currentPlaylistEl.firstChild) currentPlaylistEl.removeChild(currentPlaylistEl.firstChild);
-  playlist.forEach((pl,index) => {
+  while (currentPlaylistEl.firstChild)
+    currentPlaylistEl.removeChild(currentPlaylistEl.firstChild);
+  playlist.forEach((pl, index) => {
     const newEl = document.createElement("div");
     newEl.classList.add("playlist-song");
     newEl.textContent = pl.name;
+    //Delete playlist feature
+    const delButton = document.createElement("button");
+    delButton.textContent = "Del";
+    delButton.id = "delete-button";
+    newEl.appendChild(delButton);
+    delButton.addEventListener("click", (event) => {
+      if (isPlaylistActive) {
+        if (index === currentSong) {
+          if (songsQueue.length === 1) {
+            playlists[currentPlaylist].splice(index, 1);
+            songsQueue = [...all_songs];
+            currentSong = 0;
+            renderCurrentSong(songsQueue[currentSong]);
+          }
+          else
+          {
+            if (index === songsQueue.length - 1) {
+              playlists[currentPlaylist].splice(index, 1);
+              songsQueue = [...playlists[currentPlaylist]];
+              currentSong = 0;
+              renderCurrentSong(songsQueue[currentSong]);
+            }
+            else {
+              playlists[currentPlaylist].splice(index, 1);
+              songsQueue=[...playlists[currentPlaylist]];
+              renderCurrentSong(songsQueue[currentSong]);
+            }
+          }
+        }
+        else 
+        {
+          if (index < currentSong)
+          {
+            let prevPlayingSong = currentSong;
+            playlists[currentPlaylist].splice(index, 1);
+            songsQueue = [...playlists[currentPlaylist]];
+            currentSong = prevPlayingSong - 1;
+          }
+          else 
+          {
+            playlists[currentPlaylist].splice(index, 1);
+            songsQueue = [...playlists[currentPlaylist]];
+          }
+        }
+      }
+      else 
+      {
+        playlists[currentPlaylist].splice(index, 1);
+      }
+      showPlaylistItems(playlists[currentPlaylist]);
+      event.stopPropagation();
+    });
+    //
     currentPlaylistEl.appendChild(newEl);
-    newEl.addEventListener('click', () => {
+    newEl.addEventListener("click", () => {
+      isPlaylistActive = true;
       songsQueue = [...playlist];
       currentSong = index;
       renderCurrentSong(songsQueue[currentSong]);
-    })
+    });
   });
 }
 
-document.getElementById("add-to-playlist").addEventListener('click', () => {
+document.getElementById("add-to-playlist").addEventListener("click", () => {
   if (currentPlaylist === null) return;
-  if (playlists[currentPlaylist].find((song) => {
-    if (song.id === songsQueue[currentSong].id) return true;
-  })) return;
+  if (
+    playlists[currentPlaylist].find((song) => {
+      if (song.id === songsQueue[currentSong].id) return true;
+    })
+  )
+    return;
   playlists[currentPlaylist].push(songsQueue[currentSong]);
   showPlaylistItems(playlists[currentPlaylist]);
 });
-
 
 (function () {
   const dropdownGenre = document.getElementById("genres");
@@ -221,63 +270,63 @@ document.getElementById("add-to-playlist").addEventListener('click', () => {
   mediaPlayer.pause();
 })();
 
-
-function toggleTheme()
-{
+function toggleTheme() {
   const toggleButton = document.getElementById("toggle-theme-button");
-  if (toggleButton.checked) //Dark Mode
-  {
+  if (toggleButton.checked) {
+    //Dark Mode
     const prevTheme = document.getElementById("light-theme");
     if (prevTheme) prevTheme.remove();
-     let link = document.createElement("link");
-     link.rel = "stylesheet";
-     link.type = "text/css";
-     link.href = "darkTheme.css";
-     link.id = "dark-theme";
-     document.head.appendChild(link);
-  }
-  else //Light Mode
-  {
+    let link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.href = "darkTheme.css";
+    link.id = "dark-theme";
+    document.head.appendChild(link);
+  } //Light Mode
+  else {
     const prevTheme = document.getElementById("dark-theme");
     if (prevTheme) prevTheme.remove();
-     let link = document.createElement("link");
-     link.rel = "stylesheet";
-     link.type = "text/css";
-     link.href = "lightTheme.css";
-     link.id = "light-theme";
-     document.head.appendChild(link);
+    let link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.href = "lightTheme.css";
+    link.id = "light-theme";
+    document.head.appendChild(link);
   }
 }
 
-document.getElementById("toggle-theme-button").addEventListener('click', toggleTheme);
+document
+  .getElementById("toggle-theme-button")
+  .addEventListener("click", toggleTheme);
 
-document.getElementById("searchButton").addEventListener('click',searchCallback);
-document.getElementById("searchInput").addEventListener('keydown', (event) => {
+document
+  .getElementById("searchButton")
+  .addEventListener("click", searchCallback);
+document.getElementById("searchInput").addEventListener("keydown", (event) => {
   if (event.key === "Enter") searchCallback();
-})
+});
 
-
-function searchCallback()
-{
+function searchCallback() {
   let searchString = document.getElementById("searchInput").value;
   searchString = searchString.trim();
   // if (searchString === "") return;
   searchSongs(searchString);
 }
 
-function searchSongs(searchString)
-{
+function searchSongs(searchString) {
   let searchQueue = filtered_queue.filter((song) => {
-    if (song.name.toLowerCase().includes(searchString.toLowerCase())) return true;
-    if (song.artist.toLowerCase().includes(searchString.toLowerCase())) return true;
+    if (song.name.toLowerCase().includes(searchString.toLowerCase()))
+      return true;
+    if (song.artist.toLowerCase().includes(searchString.toLowerCase()))
+      return true;
   });
   const filteredList = document.getElementById("filtered-songs-list");
-  filteredList.innerHTML = '';
-  searchQueue.forEach((song,index) => {
+  filteredList.innerHTML = "";
+  searchQueue.forEach((song, index) => {
     const newItem = document.createElement("div");
-    newItem.classList.add('song-item');
+    newItem.classList.add("song-item");
     newItem.textContent = `${song.name} -${song.artist}`;
-    
+
     newItem.addEventListener("click", () => {
       songsQueue = [...searchQueue];
       currentSong = index;
