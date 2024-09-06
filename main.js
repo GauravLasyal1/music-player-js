@@ -335,3 +335,4 @@ function searchSongs(searchString) {
     filteredList.appendChild(newItem);
   });
 }
+
